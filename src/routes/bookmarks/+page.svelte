@@ -3,21 +3,24 @@
     import { BookmarkIcon } from '$lib/icons';
     import Navbar from '$lib/components/Navbar.svelte';
     import ScrolledContent from '$lib/components/ScrolledContent.svelte';
-    import { t, bookmarks } from '$lib/data/stores';
+    import { t } from '$lib/data/stores';
+    import { getBookmarks } from '$lib/data/bookmarks';
 
     function handleMenuaction(event: CustomEvent, id: string) {
         switch (event.detail.text) {
             case $t['Annotation_Menu_View']:
-                console.log('View: ', $bookmarks[id].reference);
+                console.log('View: ', data.bookmarks[id].reference);
                 break;
             case $t['Annotation_Menu_Share']:
-                console.log('Share: ', $bookmarks[id].reference);
+                console.log('Share: ', data.bookmarks[id].reference);
                 break;
             case $t['Annotation_Menu_Delete']:
                 console.log('Delete: ', id);
                 break;
         }
     }
+    
+    export let data;
 </script>
 
 <div class="navbar h-16">
@@ -32,7 +35,7 @@
 
 <ScrolledContent>
     <div slot="scrolled-content" style="height: calc(100vh - 5rem);height: calc(100dvh - 5rem);">
-        {#each $bookmarks as b}
+        {#each data.bookmarks as b}
             {@const iconCard = {
                 reference: b.reference,
                 text: b.text,
@@ -43,9 +46,9 @@
                     $t['Annotation_Menu_Delete']
                 ]
             }}
-            <IconCard on:menuaction={(e) => handleMenuaction(e, b.id)} {...iconCard}>
+            <!-- <IconCard on:menuaction={(e) => handleMenuaction(e, b.reference)} {...iconCard}>
                 <BookmarkIcon slot="icon" color="red" />
-            </IconCard>
+            </IconCard> -->
         {/each}
     </div>
 </ScrolledContent>
