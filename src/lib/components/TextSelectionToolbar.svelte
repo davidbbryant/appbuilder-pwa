@@ -11,7 +11,7 @@ TODO:
 - Add note dialog
 - Add highlight colors
 -->
-<script>
+<script lang='ts'>
     import {
         AudioIcon,
         CopyContentIcon,
@@ -22,12 +22,12 @@ TODO:
         ShareIcon
     } from '$lib/icons';
     import { ImageIcon } from '$lib/icons/image';
-    import config from '$lib/data/config.js';
+    import config from '$lib/data/config';
     import {
         t,
         s,
         refs,
-        bookmarks,
+        // bookmarks,
         notes,
         highlights,
         selectedVerses,
@@ -35,6 +35,7 @@ TODO:
         themeColors
     } from '$lib/data/stores';
     import toast, { Toaster } from 'svelte-french-toast';
+    import { addBookmark, findBookmark, removeBookmark } from '$lib/data/bookmarks';
 
     const isAudioPlayable = config?.mainFeatures['text-select-play-audio'];
     const isRepeatableAudio = config?.mainFeatures['audio-repeat-selection-button'];
@@ -69,7 +70,7 @@ TODO:
             ':' +
             $selectedVerses[0]['verse'];
         var extraVerses = '';
-        for (var i = 1; i < $selectedVerses.size; i++) {
+        for (var i = 1; i < $selectedVerses.length; i++) {
             extraVerses = extraVerses.concat(', ' + $selectedVerses[i]['verse']);
         }
         scriptureReference.concat(extraVerses);
@@ -77,9 +78,15 @@ TODO:
         return scriptureReference;
     }
 
-    function updateSelectedVerseInBookmarks(selectedVerses) {
-        selectedVerseInBookmarks = findAnnotation($bookmarks, selectedVerses[0]);
+    async function updateSelectedVerseInBookmarks(selectedVerses) {
+        selectedVerseInBookmarks = await findBookmark({
+            collection: selectedVerses[0].collection,
+            book: selectedVerses[0].book,
+            chapter: selectedVerses[0].chapter,
+            verse: selectedVerses[0].verse
+        });
     }
+
     function findAnnotation(annotations, annotation) {
         let index = -1;
         for (var i = 0; i < annotations.length; i++) {
@@ -95,40 +102,58 @@ TODO:
         }
         return index;
     }
-    function modifyBookmark() {
+
+    async function modifyBookmark() {
         // If there is already a bookmark at this verse, remove it
-        const index = findAnnotation($bookmarks, $selectedVerses[0]);
+        const index = await findBookmark({
+            collection: $selectedVerses[0].collection,
+            book: $selectedVerses[0].book,
+            chapter: $selectedVerses[0].chapter,
+            verse: $selectedVerses[0].verse
+        });
+
+        console.log(index);
+
         if (index === -1) {
-            addBookmark();
+            await addBookmark({
+                collection: $selectedVerses[0].collection,
+                book: $selectedVerses[0].book,
+                chapter: $selectedVerses[0].chapter,
+                verse: $selectedVerses[0].verse,
+                text: selectedVerses.getVerseByIndex(0).text,
+                reference: selectedVerses.getReference(0)
+            });
         } else {
-            removeBookmark(index);
+            await removeBookmark(index);
         }
         selectedVerses.reset();
     }
-    function addBookmark() {
-        const timeElapsed = Date.now();
-        const today = new Date(timeElapsed);
-        $bookmarks = [
-            ...$bookmarks,
-            {
-                id: $bookmarks.length,
-                reference: selectedVerses.getReference(0),
-                text: selectedVerses.getVerseByIndex(0).text,
-                date: today.toDateString(),
-                docSet: $selectedVerses[0].docSet,
-                book: $selectedVerses[0].book,
-                chapter: $selectedVerses[0].chapter,
-                verse: $selectedVerses[0].verse
-            }
-        ];
-    }
 
-    function removeBookmark(index) {
-        bookmarks.update((b) => {
-            b.splice(index, 1);
-            return b;
-        });
-    }
+    // function addBookmark() {
+    //     const timeElapsed = Date.now();
+    //     const today = new Date(timeElapsed);
+    //     $bookmarks = [
+    //         ...$bookmarks,
+    //         {
+    //             id: $bookmarks.length,
+    //             reference: selectedVerses.getReference(0),
+    //             text: selectedVerses.getVerseByIndex(0).text,
+    //             date: today.toDateString(),
+    //             docSet: $selectedVerses[0].docSet,
+    //             book: $selectedVerses[0].book,
+    //             chapter: $selectedVerses[0].chapter,
+    //             verse: $selectedVerses[0].verse
+    //         }
+    //     ];
+    // }
+
+    // function removeBookmark(index) {
+    //     bookmarks.update((b) => {
+    //         b.splice(index, 1);
+    //         return b;
+    //     });
+    // }
+
     function addNote() {
         const timeElapsed = Date.now();
         const today = new Date(timeElapsed);
@@ -298,7 +323,7 @@ TODO:
                     </button>
                 {/if}
                 {#if isBookmarkEnabled}
-                    <button class="dy-btn-sm dy-btn-ghost" on:click={() => modifyBookmark()}>
+                    <button class="dy-btn-sm dy-btn-ghost" on:click={async function () { await modifyBookmark() }}>
                         {#if selectedVerseInBookmarks >= 0}
                             <BookmarkIcon color="#b10000" />
                         {:else}
