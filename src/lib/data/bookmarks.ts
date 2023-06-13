@@ -9,13 +9,13 @@ export interface BookmarkItem {
     verse: string;
     text: string;
     reference: string;
+    bookIndex: number;
 }
 interface Bookmarks extends DBSchema {
     bookmarks: {
         key: number;
-        bookIndex: number;
         value: BookmarkItem;
-        indexes: { "bookIndex": number, "collection, book, chapter, verse": string };
+        indexes: { "collection, book, chapter, verse": string, "collection, book, chapter": string };
     };
 }
 
@@ -25,11 +25,11 @@ async function openBookmarks() {
         bookmarkDB = await openDB<Bookmarks>("bookmarks", 1, {
             upgrade(db) {
                 const bookmarkStore = db.createObjectStore("bookmarks", {
-                    keyPath: "bookIndex",
+                    keyPath: "key",
                 });
         
-                bookmarkStore.createIndex("bookIndex", "bookIndex");
                 bookmarkStore.createIndex("collection, book, chapter, verse", ["collection", "book", "chapter", "verse"])
+                bookmarkStore.createIndex("collection, book, chapter", ["collection", "book", "chapter"])
             },
         });
     }
@@ -59,16 +59,37 @@ export async function findBookmark(item: {
     chapter: string;
     verse: string;
 }) {
-    let bookmark = await openBookmarks();
-    bookmark.index("collection, book, chapter, verse").get([item.collection, item.book, item.chapter, item.verse]);
-    //should be an object store
-    return -1;
+    const bookmark = await openBookmarks();
+    const tx = bookmark.transaction("bookmarks", "readonly");
+    const index = tx.store.index("collection, book, chapter, verse");
+    const result = await index.getAll([item.collection, item.book, item.chapter, item.verse]);
+    await tx.done;
+    if (result[0])
+    {
+        return result[0].key;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+export async function findBookmarkByChapter(item: {
+    collection: string;
+    book: string;
+    chapter: string;
+}) {
+    const bookmark = await openBookmarks();
+    const tx = bookmark.transaction("bookmarks", "readonly");
+    const index = tx.store.index("collection, book, chapter");
+    const result = await index.getAll([item.collection, item.book, item.chapter]);
+    await tx.done;
+    return result;
 }
 
 export async function removeBookmark(key: number) {
     let bookmark = await openBookmarks();
-    //await bookmark.delete(key);
-    //What are these kinds of functions actually calling? I don't see this in the documentation
+    await bookmark.delete("bookmarks", key);
 }
 
 export async function clearBookmarks() {

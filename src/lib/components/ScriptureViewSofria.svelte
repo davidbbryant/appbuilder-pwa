@@ -407,20 +407,9 @@ TODO:
                                         els[i].addEventListener('click', onClick, false);
                                     }
                                 }
-                                const bookmarksInChapter = annotationsForChapter(
-                                    bookmarks,
-                                    docSet,
-                                    bookCode,
-                                    chapter
-                                );
-                                addBookmarkedVerses(bookmarksInChapter);
-                                const highlightsInChapter = annotationsForChapter(
-                                    highlights,
-                                    docSet,
-                                    bookCode,
-                                    chapter
-                                );
-                                addHighlightedVerses(highlightsInChapter);
+                                //addNotedVerses()
+                                addBookmarkedVerses(bookmarks);
+                                addHighlightedVerses(highlights);
                                 addVideos(videos);
                             }
 

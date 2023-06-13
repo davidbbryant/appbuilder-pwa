@@ -27,7 +27,7 @@ TODO:
         t,
         s,
         refs,
-        // bookmarks,
+        bookmarks,
         notes,
         highlights,
         selectedVerses,
@@ -35,7 +35,7 @@ TODO:
         themeColors
     } from '$lib/data/stores';
     import toast, { Toaster } from 'svelte-french-toast';
-    import { addBookmark, findBookmark, removeBookmark } from '$lib/data/bookmarks';
+    import { addBookmark, findBookmark, findBookmarkByChapter, removeBookmark } from '$lib/data/bookmarks';
 
     const isAudioPlayable = config?.mainFeatures['text-select-play-audio'];
     const isRepeatableAudio = config?.mainFeatures['audio-repeat-selection-button'];
@@ -126,6 +126,13 @@ TODO:
         } else {
             await removeBookmark(index);
         }
+        
+        $bookmarks = await findBookmarkByChapter({
+            collection: $selectedVerses[0].collection,
+            book: $selectedVerses[0].book,
+            chapter: $selectedVerses[0].chapter
+        });
+        console.log($bookmarks)
         selectedVerses.reset();
     }
 
