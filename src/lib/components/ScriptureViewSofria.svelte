@@ -444,13 +444,7 @@ TODO:
                                     chapter
                                 );
                                 addNotedVerses(notesInChapter);
-                                const bookmarksInChapter = annotationsForChapter(
-                                    bookmarks,
-                                    docSet,
-                                    bookCode,
-                                    chapter
-                                );
-                                addBookmarkedVerses(bookmarksInChapter);
+                                addBookmarkedVerses(bookmarks);
                                 const highlightsInChapter = annotationsForChapter(
                                     highlights,
                                     docSet,
