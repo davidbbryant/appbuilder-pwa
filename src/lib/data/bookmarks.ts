@@ -49,7 +49,7 @@ export async function addBookmark(item: {
     const bookIndex = config.bookCollections
         .find((x) => x.id === item.collection)
         .books.findIndex((x) => x.id === item.book);
-    const nextItem = {...item, key: date, bookIndex: bookIndex};
+    const nextItem = {...item, key: date, bookIndex: bookIndex, date: date};
     await bookmark.add("bookmarks", nextItem);
 }
 
@@ -99,5 +99,5 @@ export async function clearBookmarks() {
 
 export async function getBookmarks() :Promise<BookmarkItem[]> {
     const bookmarks = await openBookmarks();   
-    return await bookmarks.getAllFromIndex("bookmarks", "bookIndex");
+    return await bookmarks.getAll("bookmarks");
 }

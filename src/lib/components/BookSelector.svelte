@@ -12,8 +12,6 @@ The navbar component.
     import { catalog } from '$lib/data/catalog';
     import config from '$lib/data/config';
     import SelectList from './SelectList.svelte';
-    import { findBookmarkByChapter } from '$lib/data/bookmarks';
-    import { bookmarks } from '$lib/data/stores';
 
     // Needs testing, does updating the book correctly effect what chapters or verses are availible in the next tab?
     $: book = $nextRef.book === '' ? $refs.book : $nextRef.book;
@@ -90,12 +88,6 @@ The navbar component.
             chapter: $nextRef.chapter,
             verse: $nextRef.verse
         });
-        $bookmarks = await findBookmarkByChapter({
-            collection: $refs.collection,
-            book: $nextRef.book,
-            chapter: $nextRef.chapter
-        });
-        document.activeElement.blur();
     }
 
     function resetNavigation() {

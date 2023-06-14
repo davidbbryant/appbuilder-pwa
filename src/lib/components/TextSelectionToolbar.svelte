@@ -11,7 +11,7 @@ TODO:
 - Add note dialog
 - Add highlight colors
 -->
-<script lang='ts'>
+<script lang="ts">
     import {
         AudioIcon,
         CopyContentIcon,
@@ -35,7 +35,7 @@ TODO:
         themeColors
     } from '$lib/data/stores';
     import toast, { Toaster } from 'svelte-french-toast';
-    import { addBookmark, findBookmark, findBookmarkByChapter, removeBookmark } from '$lib/data/bookmarks';
+    import { addBookmark, findBookmark, removeBookmark } from '$lib/data/bookmarks';
 
     const isAudioPlayable = config?.mainFeatures['text-select-play-audio'];
     const isRepeatableAudio = config?.mainFeatures['audio-repeat-selection-button'];
@@ -126,13 +126,8 @@ TODO:
         } else {
             await removeBookmark(index);
         }
-        
-        $bookmarks = await findBookmarkByChapter({
-            collection: $selectedVerses[0].collection,
-            book: $selectedVerses[0].book,
-            chapter: $selectedVerses[0].chapter
-        });
-        console.log($bookmarks)
+
+        await bookmarks.sync();
         selectedVerses.reset();
     }
 
@@ -252,42 +247,42 @@ TODO:
                 <div class="pen-grid grid grid-rows-1 gap-2 my-2">
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
-                        class="dy-btn-sm "
+                        class="dy-btn-sm"
                         style:background-color={$themeColors['HighlighterPenYellow']}
                         style:border={buttonBorder}
                         on:click={() => modifyHighlight(1)}
                     />
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
-                        class="dy-btn-sm "
+                        class="dy-btn-sm"
                         style:background-color={$themeColors['HighlighterPenGreen']}
                         style:border={buttonBorder}
                         on:click={() => modifyHighlight(2)}
                     />
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
-                        class="dy-btn-sm "
+                        class="dy-btn-sm"
                         style:background-color={$themeColors['HighlighterPenBlue']}
                         style:border={buttonBorder}
                         on:click={() => modifyHighlight(3)}
                     />
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
-                        class="dy-btn-sm "
+                        class="dy-btn-sm"
                         style:background-color={$themeColors['HighlighterPenOrange']}
                         style:border={buttonBorder}
                         on:click={() => modifyHighlight(4)}
                     />
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
-                        class="dy-btn-sm "
+                        class="dy-btn-sm"
                         style:background-color={$themeColors['HighlighterPenPink']}
                         style:border={buttonBorder}
                         on:click={() => modifyHighlight(5)}
                     />
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <div
-                        class="dy-btn-sm "
+                        class="dy-btn-sm"
                         style:background-color={'white'}
                         style:border={buttonBorder}
                         on:click={() => modifyHighlight(6)}
@@ -323,7 +318,12 @@ TODO:
                     </button>
                 {/if}
                 {#if isBookmarkEnabled}
-                    <button class="dy-btn-sm dy-btn-ghost" on:click={async function () { await modifyBookmark() }}>
+                    <button
+                        class="dy-btn-sm dy-btn-ghost"
+                        on:click={async function () {
+                            await modifyBookmark();
+                        }}
+                    >
                         {#if selectedVerseInBookmarks >= 0}
                             <BookmarkIcon color="#b10000" />
                         {:else}
