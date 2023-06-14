@@ -88,6 +88,7 @@ The navbar component.
             chapter: $nextRef.chapter,
             verse: $nextRef.verse
         });
+        document.activeElement.blur();
     }
 
     function resetNavigation() {

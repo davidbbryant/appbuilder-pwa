@@ -25,7 +25,7 @@ async function openBookmarks() {
         bookmarkDB = await openDB<Bookmarks>("bookmarks", 1, {
             upgrade(db) {
                 const bookmarkStore = db.createObjectStore("bookmarks", {
-                    keyPath: "key",
+                    keyPath: "date",
                 });
         
                 bookmarkStore.createIndex("collection, book, chapter, verse", ["collection", "book", "chapter", "verse"])
@@ -44,13 +44,13 @@ export async function addBookmark(item: {
     text: string;
     reference: string;
 }) {
-    let bookmark = await openBookmarks();
+    const bookmarks = await openBookmarks();
     const date = new Date()[Symbol.toPrimitive]('number');
     const bookIndex = config.bookCollections
         .find((x) => x.id === item.collection)
         .books.findIndex((x) => x.id === item.book);
-    const nextItem = {...item, key: date, bookIndex: bookIndex, date: date};
-    await bookmark.add("bookmarks", nextItem);
+    const nextItem = {...item, bookIndex: bookIndex, date: date};
+    await bookmarks.add("bookmarks", nextItem);
 }
 
 export async function findBookmark(item: {
@@ -64,14 +64,7 @@ export async function findBookmark(item: {
     const index = tx.store.index("collection, book, chapter, verse");
     const result = await index.getAll([item.collection, item.book, item.chapter, item.verse]);
     await tx.done;
-    if (result[0])
-    {
-        return result[0].key;
-    }
-    else
-    {
-        return -1;
-    }
+    return result[0] ? result[0].key : -1;
 }
 
 export async function findBookmarkByChapter(item: {
@@ -79,8 +72,8 @@ export async function findBookmarkByChapter(item: {
     book: string;
     chapter: string;
 }) {
-    const bookmark = await openBookmarks();
-    const tx = bookmark.transaction("bookmarks", "readonly");
+    const bookmarks = await openBookmarks();
+    const tx = bookmarks.transaction("bookmarks", "readonly");
     const index = tx.store.index("collection, book, chapter");
     const result = await index.getAll([item.collection, item.book, item.chapter]);
     await tx.done;
@@ -88,12 +81,12 @@ export async function findBookmarkByChapter(item: {
 }
 
 export async function removeBookmark(key: number) {
-    let bookmark = await openBookmarks();
-    await bookmark.delete("bookmarks", key);
+    const bookmarks = await openBookmarks();
+    await bookmarks.delete("bookmarks", key);
 }
 
 export async function clearBookmarks() {
-    let bookmarks = await openBookmarks();
+    const bookmarks = await openBookmarks();
     await bookmarks.clear("bookmarks");
 }
 
