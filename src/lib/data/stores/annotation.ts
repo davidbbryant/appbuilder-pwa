@@ -11,7 +11,6 @@ function createBookmarks() {
         chapter: string;
     }) => {
         const foundBookmarks = await findBookmarkByChapter(item);
-        console.log(foundBookmarks);
         set(foundBookmarks);
     };
 
