@@ -407,9 +407,14 @@ TODO:
                                         els[i].addEventListener('click', onClick, false);
                                     }
                                 }
-                                //addNotedVerses()
                                 addBookmarkedVerses(bookmarks);
-                                addHighlightedVerses(highlights);
+                                const highlightsInChapter = annotationsForChapter(
+                                    highlights,
+                                    docSet,
+                                    bookCode,
+                                    chapter
+                                );
+                                addHighlightedVerses(highlightsInChapter);
                                 addVideos(videos);
                             }
 
