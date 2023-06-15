@@ -44,13 +44,13 @@ export async function addBookmark(item: {
     text: string;
     reference: string;
 }) {
-    let bookmark = await openBookmarks();
+    let bookmarks = await openBookmarks();
     const date = new Date()[Symbol.toPrimitive]('number');
     const bookIndex = config.bookCollections
         .find((x) => x.id === item.collection)
         .books.findIndex((x) => x.id === item.book);
-    const nextItem = {...item, key: date, bookIndex: bookIndex};
-    await bookmark.add("bookmarks", nextItem);
+    const nextItem = {...item, date: date, bookIndex: bookIndex};
+    await bookmarks.add("bookmarks", nextItem);
 }
 
 export async function findBookmark(item: {
@@ -59,19 +59,12 @@ export async function findBookmark(item: {
     chapter: string;
     verse: string;
 }) {
-    const bookmark = await openBookmarks();
-    const tx = bookmark.transaction("bookmarks", "readonly");
+    const bookmarks = await openBookmarks();
+    const tx = bookmarks.transaction("bookmarks", "readonly");
     const index = tx.store.index("collection, book, chapter, verse");
     const result = await index.getAll([item.collection, item.book, item.chapter, item.verse]);
     await tx.done;
-    if (result[0])
-    {
-        return result[0].key;
-    }
-    else
-    {
-        return -1;
-    }
+    return result[0] ? result[0].date : -1;
 }
 
 export async function findBookmarkByChapter(item: {
@@ -79,17 +72,17 @@ export async function findBookmarkByChapter(item: {
     book: string;
     chapter: string;
 }) {
-    const bookmark = await openBookmarks();
-    const tx = bookmark.transaction("bookmarks", "readonly");
+    const bookmarks = await openBookmarks();
+    const tx = bookmarks.transaction("bookmarks", "readonly");
     const index = tx.store.index("collection, book, chapter");
     const result = await index.getAll([item.collection, item.book, item.chapter]);
     await tx.done;
     return result;
 }
 
-export async function removeBookmark(key: number) {
-    let bookmark = await openBookmarks();
-    await bookmark.delete("bookmarks", key);
+export async function removeBookmark(date: number) {
+    let bookmarks = await openBookmarks();
+    await bookmarks.delete("bookmarks", date);
 }
 
 export async function clearBookmarks() {
@@ -99,5 +92,5 @@ export async function clearBookmarks() {
 
 export async function getBookmarks() :Promise<BookmarkItem[]> {
     const bookmarks = await openBookmarks();   
-    return await bookmarks.getAllFromIndex("bookmarks", "bookIndex");
+    return await bookmarks.getAll("bookmarks");
 }

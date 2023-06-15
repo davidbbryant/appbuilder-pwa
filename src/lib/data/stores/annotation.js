@@ -1,12 +1,26 @@
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 import { setDefaultStorage } from "./storage";
+import { refs } from "./scripture";
+import { findBookmarkByChapter } from "$lib/data/bookmarks";
 
 /* list of bookmarks */
-setDefaultStorage('bookmarks', '[]');
-export const bookmarks = writable(JSON.parse(localStorage.bookmarks));
-bookmarks.subscribe(value => {
-    localStorage.bookmarks = JSON.stringify(value);
-});
+function createBookmarks() {
+    const {subscribe, set} = writable([]);
+    const fetchData = async (item) => {
+        const foundBookmarks = await findBookmarkByChapter(item);
+        set(foundBookmarks);
+    };
+
+    refs.subscribe(item => {
+        fetchData(item);
+    });
+    
+    return {
+        subscribe, 
+        sync: async () => await fetchData(get(refs))
+    };
+}
+export const bookmarks = createBookmarks();
 
 setDefaultStorage('highlights', '[]');
 export const highlights = writable(JSON.parse(localStorage.highlights));
