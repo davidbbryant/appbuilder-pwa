@@ -44,7 +44,7 @@ export async function addBookmark(item: {
     text: string;
     reference: string;
 }) {
-    let bookmarks = await openBookmarks();
+    const bookmarks = await openBookmarks();
     const date = new Date()[Symbol.toPrimitive]('number');
     const bookIndex = config.bookCollections
         .find((x) => x.id === item.collection)
@@ -81,12 +81,12 @@ export async function findBookmarkByChapter(item: {
 }
 
 export async function removeBookmark(date: number) {
-    let bookmarks = await openBookmarks();
+    const bookmarks = await openBookmarks();
     await bookmarks.delete("bookmarks", date);
 }
 
 export async function clearBookmarks() {
-    let bookmarks = await openBookmarks();
+    const bookmarks = await openBookmarks();
     await bookmarks.clear("bookmarks");
 }
 
