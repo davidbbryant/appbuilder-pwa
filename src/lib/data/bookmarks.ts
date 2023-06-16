@@ -25,7 +25,7 @@ async function openBookmarks() {
         bookmarkDB = await openDB<Bookmarks>("bookmarks", 1, {
             upgrade(db) {
                 const bookmarkStore = db.createObjectStore("bookmarks", {
-                    keyPath: "key",
+                    keyPath: "date",
                 });
         
                 bookmarkStore.createIndex("collection, book, chapter, verse", ["collection", "book", "chapter", "verse"])
