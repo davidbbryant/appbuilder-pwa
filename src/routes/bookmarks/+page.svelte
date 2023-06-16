@@ -4,7 +4,7 @@
     import Navbar from '$lib/components/Navbar.svelte';
     import ScrolledContent from '$lib/components/ScrolledContent.svelte';
     import { t } from '$lib/data/stores';
-    import { getBookmarks } from '$lib/data/bookmarks';
+    import { formatDateAndTime } from '$lib/scripts/dateUtils.js';
 
     function handleMenuaction(event: CustomEvent, id: string) {
         switch (event.detail.text) {
@@ -19,7 +19,7 @@
                 break;
         }
     }
-    
+
     export let data;
 </script>
 
@@ -39,16 +39,16 @@
             {@const iconCard = {
                 reference: b.reference,
                 text: b.text,
-                date: b.date,
+                date: formatDateAndTime(new Date(b.date)),
                 actions: [
                     $t['Annotation_Menu_View'],
                     $t['Annotation_Menu_Share'],
                     $t['Annotation_Menu_Delete']
                 ]
             }}
-            <!-- <IconCard on:menuaction={(e) => handleMenuaction(e, b.reference)} {...iconCard}>
+            <IconCard on:menuaction={(e) => handleMenuaction(e, b.reference)} {...iconCard}>
                 <BookmarkIcon slot="icon" color="red" />
-            </IconCard> -->
+            </IconCard>
         {/each}
     </div>
 </ScrolledContent>

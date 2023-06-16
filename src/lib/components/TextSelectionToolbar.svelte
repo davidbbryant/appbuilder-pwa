@@ -11,7 +11,7 @@ TODO:
 - Add note dialog
 - Add highlight colors
 -->
-<script lang='ts'>
+<script lang="ts">
     import {
         AudioIcon,
         CopyContentIcon,
@@ -35,7 +35,7 @@ TODO:
         themeColors
     } from '$lib/data/stores';
     import toast, { Toaster } from 'svelte-french-toast';
-    import { addBookmark, findBookmark, findBookmarkByChapter, removeBookmark } from '$lib/data/bookmarks';
+    import { addBookmark, findBookmark, removeBookmark } from '$lib/data/bookmarks';
 
     const isAudioPlayable = config?.mainFeatures['text-select-play-audio'];
     const isRepeatableAudio = config?.mainFeatures['audio-repeat-selection-button'];
@@ -112,8 +112,6 @@ TODO:
             verse: $selectedVerses[0].verse
         });
 
-        console.log(index);
-
         if (index === -1) {
             await addBookmark({
                 collection: $selectedVerses[0].collection,
@@ -126,40 +124,10 @@ TODO:
         } else {
             await removeBookmark(index);
         }
-        
-        $bookmarks = await findBookmarkByChapter({
-            collection: $selectedVerses[0].collection,
-            book: $selectedVerses[0].book,
-            chapter: $selectedVerses[0].chapter
-        });
-        console.log($bookmarks)
+
+        await bookmarks.sync();
         selectedVerses.reset();
     }
-
-    // function addBookmark() {
-    //     const timeElapsed = Date.now();
-    //     const today = new Date(timeElapsed);
-    //     $bookmarks = [
-    //         ...$bookmarks,
-    //         {
-    //             id: $bookmarks.length,
-    //             reference: selectedVerses.getReference(0),
-    //             text: selectedVerses.getVerseByIndex(0).text,
-    //             date: today.toDateString(),
-    //             docSet: $selectedVerses[0].docSet,
-    //             book: $selectedVerses[0].book,
-    //             chapter: $selectedVerses[0].chapter,
-    //             verse: $selectedVerses[0].verse
-    //         }
-    //     ];
-    // }
-
-    // function removeBookmark(index) {
-    //     bookmarks.update((b) => {
-    //         b.splice(index, 1);
-    //         return b;
-    //     });
-    // }
 
     function addNote() {
         const timeElapsed = Date.now();
@@ -330,7 +298,12 @@ TODO:
                     </button>
                 {/if}
                 {#if isBookmarkEnabled}
-                    <button class="dy-btn-sm dy-btn-ghost" on:click={async function () { await modifyBookmark() }}>
+                    <button
+                        class="dy-btn-sm dy-btn-ghost"
+                        on:click={async function () {
+                            await modifyBookmark();
+                        }}
+                    >
                         {#if selectedVerseInBookmarks >= 0}
                             <BookmarkIcon color="#b10000" />
                         {:else}
