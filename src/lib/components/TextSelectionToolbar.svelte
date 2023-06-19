@@ -27,7 +27,6 @@ TODO:
         t,
         s,
         refs,
-        bookmarks,
         notes,
         highlights,
         selectedVerses,
@@ -105,14 +104,7 @@ TODO:
 
     async function modifyBookmark() {
         // If there is already a bookmark at this verse, remove it
-        const index = await findBookmark({
-            collection: $selectedVerses[0].collection,
-            book: $selectedVerses[0].book,
-            chapter: $selectedVerses[0].chapter,
-            verse: $selectedVerses[0].verse
-        });
-
-        if (index === -1) {
+        if (selectedVerseInBookmarks === -1) {
             await addBookmark({
                 collection: $selectedVerses[0].collection,
                 book: $selectedVerses[0].book,
@@ -122,10 +114,9 @@ TODO:
                 reference: selectedVerses.getReference(0)
             });
         } else {
-            await removeBookmark(index);
+            await removeBookmark(selectedVerseInBookmarks);
         }
 
-        await bookmarks.sync();
         selectedVerses.reset();
     }
 

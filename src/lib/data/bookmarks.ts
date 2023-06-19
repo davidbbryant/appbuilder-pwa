@@ -1,5 +1,6 @@
 import { openDB, type DBSchema } from "idb";
 import config from '$lib/data/config';
+import { bookmarks as bookmarksStore } from '$lib/data/stores/annotation';
 
 export interface BookmarkItem {
     date: number;
@@ -51,6 +52,7 @@ export async function addBookmark(item: {
         .books.findIndex((x) => x.id === item.book);
     const nextItem = {...item, date: date, bookIndex: bookIndex};
     await bookmarks.add("bookmarks", nextItem);
+    await bookmarksStore.sync();
 }
 
 export async function findBookmark(item: {
@@ -83,6 +85,7 @@ export async function findBookmarkByChapter(item: {
 export async function removeBookmark(date: number) {
     const bookmarks = await openBookmarks();
     await bookmarks.delete("bookmarks", date);
+    await bookmarksStore.sync();
 }
 
 export async function clearBookmarks() {
