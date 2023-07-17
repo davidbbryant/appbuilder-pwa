@@ -26,11 +26,25 @@ export function compareDate(a, b) {
     }
 }
 
+export function compareColor(a, b) {
+    if (a.penColor > b.penColor) {
+        return 1;
+    } else if (a.penColor < b.penColor) {
+        return -1;
+    } else if (a.date < b.date) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
 export function toSorted(items, sortType) {
     if (sortType === SORT_REFERENCE) {
         return items.toSorted(compareReference);
     } else if (sortType === SORT_DATE) {
         return items.toSorted(compareDate);
+    } else if (sortType === SORT_COLOR) {
+        return items.toSorted(compareColor);
     }
     return items;
 }
